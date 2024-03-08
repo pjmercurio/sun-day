@@ -1,0 +1,9 @@
+[
+    {
+      "origin": ["http://localhost:5501", "http://paulmercur.io", "http://www.paulmercur.io"],
+      "responseHeader": ["Content-Type"],
+      "method": ["GET", "POST", "HEAD"],
+      "maxAgeSeconds": 3600
+    }
+  ]
+  

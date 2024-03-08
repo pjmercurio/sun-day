@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>SunDay</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="main.js"></script>
+    <link rel="stylesheet" href="styles/style.css">
+    <link rel="stylesheet" href="styles/canvas.css">
+    <link rel="stylesheet" href="styles/fonts.css">
+</head>
+<body style="background-color: #FF851A;">
+    <div id="splash-container" onclick="showWelcomePage()">
+        <h1 id="splash-title" class="animatable-item">SunDay</h1>
+        <div class="splash-image-container">
+            <div>
+                <img src="images/halfsun.png" id="splash-image-1" class="animatable-item">
+            </div>
+            <div>
+                <img src="images/halfsun_0.png" id="splash-image-2" class="animatable-item" style="position: absolute">
+                <img src="images/halfsun_1.png" id="splash-image-3" class="animatable-item" style="position: absolute; opacity: 0">
+            </div>
+        </div>
+        <h1 id="splash-footer" class="animatable-item">06.23.24</h1>
+    </div>
+
+    <div class="animatable-item" id="welcome-container" onclick="showTutorialPage()">
+        <div id="welcome-container-inner">
+            <h2 id="welcome-title" class="animatable-item">Rise up<br>for climate<br>action.</h2>
+            <p id="welcome-text" class="animatable-item">The sun rises for us every day. On June 23, 2024, we will rise for the sun. Because the solution, solar power, is right above us. Now we need everyone's rays, especially yours, today to help the people in power to look up too.</p>
+        </div>
+        <div>
+            <div class="divider-line"></div>
+            <div class="nav-button" onclick="readMore(event)">
+                <p>Read More</p>
+                <img src="images/arrow.png" alt="Arrow" class="arrow">
+            </div>
+            <div class="divider-line"></div>
+            <div class="nav-button" onclick="drawYourSun(event)">
+                <p>Draw Your Sun</p>
+                <img src="images/arrow.png" alt="Arrow" class="arrow">
+            </div>
+        </div>
+    </div>
+
+    <div class="animatable-item" id="drawing-container">
+        <div id="drawing-container-inner">
+            <h1 id="drawing-title" style="color: black">Draw</h1>
+            <div id="drawing-canvas-container">
+                <div id="drawing-canvas-static"></div>
+                <div id="drawing-canvas-active">
+                    <canvas id="drawing-canvas"></canvas>
+                </div>
+            </div>
+            <div id="drawing-canvas-buttons">
+                <!-- <div class="divider-line-vertical dark"></div>
+                <div class="divider-line dark"></div>
+                <div id="canvas-toolkit">
+                    <div id="close-toolkit-button" onclick="hideToolkit()"></div>
+                    <div style="flex-direction: row;">
+                        <div class="size-button" data-size="2" onclick="changeSize(event)"></div>
+                        <div class="size-button" data-size="4" onclick="changeSize(event)"></div>
+                        <div class="size-button" data-size="6" onclick="changeSize(event)"></div>
+                        <div class="size-button" data-size="8" onclick="changeSize(event)"></div>
+                        <div class="size-button" data-size="10" onclick="changeSize(event)"></div>
+                    </div>
+                    <div>
+                        <canvas id="color-wheel-canvas" width="100" height="100"></canvas>
+                        <div id="color-indicator"></div>
+                    </div>
+                </div>
+                <div id="canvas-button-row-top">
+                    <div class="canvas-button" onclick="showToolkit()"><img src="images/plus_icon.png" />Toolkit</div>
+                    <div style="display: flex;">
+                        <div class="canvas-button" onclick="undo()"><img src="images/undo_icon.png" /></div>
+                        <div class="canvas-button" onclick="redo()"><img src="images/redo_icon.png" /></div>
+                    </div>
+                </div>
+                <div class="divider-line dark"></div>
+                <div id="canvas-button-row-bottom">
+                    <div class="canvas-button"><img src="images/prev_icon.png" />Back</div>
+                    <div class="canvas-button" onclick="saveImage()">Finished<img src="images/next_icon.png" /></div>
+                </div> -->
+                <div id="canvas-button-row-top">
+                    <div style="display: flex; width: 100%;">
+                        <div class="canvas-button" onclick="toggleToolkit()"><img id="toggle-toolkit-image" src="images/plus_icon.png" />Toolkit</div>
+                        <div class="half-width" style="display: flex;">
+                            <div class="canvas-button" onclick="undo()"><img src="images/undo_icon.png" /></div>
+                            <div class="inner-border"></div>
+                            <div class="canvas-button" onclick="redo()"><img src="images/redo_icon.png" /></div>
+                        </div>
+                    </div>
+                    <div id="canvas-toolkit" class="toolkit-closed">
+                        <div style="flex-direction: row;">
+                            <div class="size-button" data-size="2" onclick="changeSize(event)"></div>
+                            <div class="size-button" data-size="4" onclick="changeSize(event)"></div>
+                            <div class="size-button selected" data-size="6" onclick="changeSize(event)"></div>
+                            <div class="size-button" data-size="8" onclick="changeSize(event)"></div>
+                            <div class="size-button" data-size="10" onclick="changeSize(event)"></div>
+                        </div>
+                        <div>
+                            <canvas id="color-wheel-canvas" width="100" height="100"></canvas>
+                            <div id="color-indicator"></div>
+                        </div>
+                    </div>
+                </div>
+                <div id="canvas-button-row-bottom">
+                    <div class="canvas-button"><img src="images/prev_icon.png" />Back</div>
+                    <div class="canvas-button" onclick="saveImage()">Finished<img src="images/next_icon.png" /></div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</body>
+</html>

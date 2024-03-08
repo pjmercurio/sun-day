@@ -1,0 +1,76 @@
+@font-face {
+    font-family: 'Heltar SeimBold';
+    src: url('../fonts/Heltar\ SemiBold.ttf') format('truetype');
+}
+
+@font-face {
+    font-family: 'Review';
+    src: url('../fonts/Review-Regular.otf') format('opentype');
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: 'Review';
+    src: url('../fonts/Review-Thin.otf') format('opentype');
+    font-weight: thin;
+}
+
+@font-face {
+    font-family: 'Review';
+    src: url('../fonts/Review-Light.otf') format('opentype');
+    font-weight: light;
+}
+
+@font-face {
+    font-family: 'Review';
+    src: url('../fonts/Review-Bold.otf') format('opentype');
+    font-weight: bold;
+}
+
+@font-face {
+    font-family: 'Review Condensed';
+    src: url('../fonts/ReviewCondensed-Regular.otf') format('opentype');
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: 'Review Condensed';
+    src: url('../fonts/ReviewCondensed-Thin.otf') format('opentype');
+    font-weight: thin;
+}
+
+@font-face {
+    font-family: 'Review Condensed';
+    src: url('../fonts/ReviewCondensed-Light.otf') format('opentype');
+    font-weight: light;
+}
+
+@font-face {
+    font-family: 'Review Condensed';
+    src: url('../fonts/ReviewCondensed-Bold.otf') format('opentype');
+    font-weight: bold;
+}
+
+@font-face {
+    font-family: 'Review Poster';
+    src: url('../fonts/ReviewPoster-Regular.otf') format('opentype');
+    font-weight: normal;
+}
+
+@font-face {
+    font-family: 'Review Poster';
+    src: url('../fonts/ReviewPoster-Thin.otf') format('opentype');
+    font-weight: thin;
+}
+
+@font-face {
+    font-family: 'Review Poster';
+    src: url('../fonts/ReviewPoster-Light.otf') format('opentype');
+    font-weight: light;
+}
+
+@font-face {
+    font-family: 'Review Poster';
+    src: url('../fonts/ReviewPoster-Bold.otf') format('opentype');
+    font-weight: bold;
+}

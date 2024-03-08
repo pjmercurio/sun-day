@@ -1,0 +1,119 @@
+body::before, body::after {
+    background-color: transparent !important;
+}
+
+body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: 'Review';
+    transition: background-color 1000ms;
+    overflow: hidden;
+    touch-action: manipulation;
+}
+
+.animatable-item {
+    transition: all 1000ms;
+}
+
+#splash-container {
+    height: 95%;
+    text-align: center;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+}
+
+#welcome-container {
+    display: none;
+    opacity: 0;
+    height: 98%;
+    padding: 12px;
+    color: white;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+#welcome-container-inner {
+    padding: 8px 0;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+
+h1 {
+    font-size: 4em;
+    margin: 0.67em 0;
+}
+
+h2 {
+    font-size: 3.5em;
+    margin: 0.67em 0;
+    line-height: 50px;
+}
+
+p {
+    font-size: 1.5em; /* Adjust size as needed */
+    margin: 0.67em 0;
+}
+
+.splash-image-container {
+    display: flex;
+    justify-content: center;
+    column-gap: 10px;
+}
+
+.splash-image-container > div {
+    position: relative;
+    width: 40%; /* Match the width of the left image */
+    height: auto; /* Adjust based on your needs */
+}
+.splash-image-container img {
+    /* position: absolute; */
+    left: 0;
+    width: 100%;
+    height: auto;
+}
+
+.divider-line {
+    position: absolute;
+    width: 100%;
+    height: 1px;
+    margin-left: -12px;
+    background-color: white;
+}
+
+.divider-line.dark {
+    position: relative;
+    background-color: #333;
+    width: calc(100% + 86px);
+    margin-left: -43px;
+}
+
+.divider-line-vertical.dark {
+    position: absolute;
+    background-color: #333;
+    width: 1px;
+    height: calc(100% + 16px);
+    top: 0px;
+    left: 50%;
+}
+
+.arrow {
+    width: 17px;
+    height: 25px;
+}
+
+.nav-button {
+    display: flex;
+    justify-content: space-between;
+    align-content: center;
+    align-items: center;
+}

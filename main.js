@@ -1,11 +1,25 @@
+// Global constants
+let welcomeContainer;
+let drawingContainer;
+let canvas;
+let canvasToolKit;
+const outputImageCanvas = document.createElement('canvas');
+const outputImageCanvasCtx = outputImageCanvas.getContext('2d');
+
 // Global vars
 let undoSteps = [];
 let redoSteps = [];
 let isToolkitVisible = false;
+let currentBrush = null;
+let currentSize = 10;
 let currentColor = '#000000';
 
 document.addEventListener('DOMContentLoaded', function() {
     startImageSlideshow();
+    welcomeContainer = document.getElementById('welcome-container');
+    drawingContainer = document.getElementById('drawing-container');
+    canvas = document.getElementById('drawing-canvas');
+    canvasToolKit = document.getElementById('canvas-toolkit');
 });
 
 function startImageSlideshow() {
@@ -31,12 +45,11 @@ function startImageSlideshow() {
 
         // Prepare for the next iteration
         currentIndex = nextIndex;
-    }, 5000);
+    }, 4000);
 }
 
 function showWelcomePage() {
     const splashContainer = document.getElementById('splash-container');
-    const welcomeContainer = document.getElementById('welcome-container');
     document.body.style.backgroundColor = 'black';
     document.getElementById('splash-title').style.transform = 'translateY(-200%)';
     document.getElementById('splash-image-1').style.transform = 'translateX(-200%)';
@@ -59,9 +72,6 @@ function readMore(event) {
 
 function drawYourSun(event) {
     event.stopPropagation();
-    console.log('draw your sun');
-    const welcomeContainer = document.getElementById('welcome-container');
-    const drawingContainer = document.getElementById('drawing-container');
     welcomeContainer.style.opacity = 0;
     welcomeContainer.style.transform = 'translateX(-200%)';
     document.body.style.backgroundColor = 'white';
@@ -76,10 +86,9 @@ function drawYourSun(event) {
 }
 
 function setupCanvas() {
-    const canvas = document.getElementById('drawing-canvas');
     const ctx = canvas.getContext('2d');
-    const colorPicker = document.getElementById('color-picker');
-    let drawing = false;
+    const halfSize = currentSize / 2;
+    let isDrawing = false;
 
     // Adjust for high-DPI displays
     const dpr = window.devicePixelRatio || 1;
@@ -91,28 +100,74 @@ function setupCanvas() {
     ctx.lineJoin = 'round';
     ctx.lineCap = 'round';
 
+    // Create an offscreen canvas to draw on
+    const offscreenCanvas = document.createElement('canvas');
+    const offscreenCtx = offscreenCanvas.getContext('2d');
+    offscreenCanvas.width = canvas.width;
+    offscreenCanvas.height = canvas.height;
+
     function startDrawing(e) {
-        drawing = true;
+        isDrawing = true;
         const { offsetX, offsetY } = getOffset(e);
-        ctx.beginPath();
-        ctx.moveTo(offsetX, offsetY);
-        // Prevent scrolling on touch devices
+
+        if (currentBrush) {
+            // Draw the brush image onto the off-screen canvas
+            offscreenCtx.globalCompositeOperation = 'source-over';
+            offscreenCtx.drawImage(currentBrush, offsetX - halfSize, offsetY - halfSize, currentSize, currentSize);
+
+            // Apply color by drawing a colored rectangle over the image on the off-screen canvas
+            offscreenCtx.globalCompositeOperation = 'source-in';
+            offscreenCtx.fillStyle = currentColor;
+            offscreenCtx.fillRect(offsetX - halfSize, offsetY - halfSize, currentSize, currentSize);
+
+            // Now, composite the off-screen canvas onto the main canvas
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.drawImage(offscreenCanvas, 0, 0);
+
+            // Clear the off-screen canvas to prepare it for the next frame
+            offscreenCtx.clearRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
+        } else {
+            ctx.beginPath();
+            ctx.moveTo(offsetX, offsetY);
+        }
+
         e.preventDefault();
     }
 
     function draw(e) {
-        if (!drawing) return;
+        if (!isDrawing) return;
         const { offsetX, offsetY } = getOffset(e);
-        ctx.lineTo(offsetX, offsetY);
-        ctx.strokeStyle = currentColor;
-        ctx.stroke();
+
+        if (currentBrush) {
+            // Draw the brush image onto the off-screen canvas
+            offscreenCtx.globalCompositeOperation = 'source-over';
+            offscreenCtx.drawImage(currentBrush, offsetX - halfSize, offsetY - halfSize, currentSize, currentSize);
+
+            // Apply color by drawing a colored rectangle over the image on the off-screen canvas
+            offscreenCtx.globalCompositeOperation = 'source-in';
+            offscreenCtx.fillStyle = currentColor;
+            offscreenCtx.fillRect(offsetX - halfSize, offsetY - halfSize, currentSize, currentSize);
+
+            // Now, composite the off-screen canvas onto the main canvas
+            ctx.globalCompositeOperation = 'source-over';
+            ctx.drawImage(offscreenCanvas, 0, 0);
+
+            // Clear the off-screen canvas to prepare it for the next frame
+            offscreenCtx.clearRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
+        } else {
+            ctx.lineTo(offsetX, offsetY);
+            ctx.strokeStyle = currentColor;
+            ctx.stroke();;
+        }
+
         e.preventDefault();
     }
 
     function stopDrawing() {
-        if (!drawing) return;
-        drawing = false;
+        if (!isDrawing) return;
+        isDrawing = false;
         undoSteps.push(ctx.getImageData(0, 0, canvas.width, canvas.height));
+        redoSteps = [];
     }
 
     function getOffset(e) {
@@ -153,39 +208,50 @@ function setupCanvas() {
     canvas.addEventListener('touchend', stopDrawing);
 }
 
+function selectBrush(brushIndex) {
+    const buttons = document.querySelectorAll('.brush-button');
+    buttons.forEach(button => button.classList.remove('selected'));
+    buttons[brushIndex].classList.add('selected');
+
+    if (brushIndex === 0) return currentBrush = null;
+
+    const brushes = [new Image(), new Image(), new Image()];
+    brushes.forEach((brush, index) => brush['src'] = `images/tip${index + 1}.png`);
+    currentBrush = brushes[brushIndex];
+}
+
 function setupColorWheel() {
-    const canvas = document.getElementById('color-wheel-canvas');
-    const ctx = canvas.getContext('2d');
+    const colorWheelCanvas = document.getElementById('color-wheel-canvas');
+    const ctx = colorWheelCanvas.getContext('2d');
     const dpr = window.devicePixelRatio || 1;
-    let isDrawing = false;
 
     // Set the desired size
     const desiredWidth = 100;
     const desiredHeight = 100;
 
     // Adjust for high-DPI displays
-    canvas.width = desiredWidth * dpr;
-    canvas.height = desiredHeight * dpr;
+    colorWheelCanvas.width = desiredWidth * dpr;
+    colorWheelCanvas.height = desiredHeight * dpr;
 
     // Adjust displayed size
-    canvas.style.width = desiredWidth + 'px';
-    canvas.style.height = desiredHeight + 'px';
+    colorWheelCanvas.style.width = desiredWidth + 'px';
+    colorWheelCanvas.style.height = desiredHeight + 'px';
 
     ctx.scale(dpr, dpr);
 
     const colorWheelImage = new Image();
     colorWheelImage.src = 'images/color_wheel2.png';
     colorWheelImage.onload = function() {
-        ctx.drawImage(colorWheelImage, 0, 0, canvas.width / dpr, canvas.height / dpr);
+        ctx.drawImage(colorWheelImage, 0, 0, colorWheelCanvas.width / dpr, colorWheelCanvas.height / dpr);
     };
 
-    function mouseMoved(event) {
-        // Get the bounding rectangle of the canvas
-        const rect = canvas.getBoundingClientRect();
+    function changeColor(event) {
+        // Get the bounding rectangle of the colorWheelCanvas
+        const rect = colorWheelCanvas.getBoundingClientRect();
     
         // Calculate the click position in the canvas's coordinate system
-        const x = (event.clientX - rect.left) * (canvas.width / rect.width);
-        const y = (event.clientY - rect.top) * (canvas.height / rect.height);
+        const x = (event.clientX - rect.left) * (colorWheelCanvas.width / rect.width);
+        const y = (event.clientY - rect.top) * (colorWheelCanvas.height / rect.height);
     
         // Get the color of the clicked pixel
         const pixel = ctx.getImageData(x, y, 1, 1);
@@ -193,8 +259,8 @@ function setupColorWheel() {
         const rgba = `rgba(${data[0]}, ${data[1]}, ${data[2]}, ${data[3] / 255})`;
         currentColor = rgba;
 
-        // Convert canvas coordinates back to relative positioning within the container
-        const indicatorX = (event.clientX - rect.left) + 35;
+        // Convert colorWheelCanvas coordinates back to relative positioning within the container
+        const indicatorX = (event.clientX - rect.left) + 60;
         const indicatorY = (event.clientY - rect.top) + 5;
 
         // Update the indicator's position and make it visible
@@ -204,18 +270,7 @@ function setupColorWheel() {
         indicator.style.display = 'block';
     }
 
-    canvas.addEventListener('click', mouseMoved);
-}
-
-function setupScrolling() {
-    // Prevent scrolling on touchstart, touchmove, and touchend events
-    document.addEventListener('touchstart', preventTouch, { passive: false });
-    document.addEventListener('touchmove', preventTouch, { passive: false });
-    document.addEventListener('touchend', preventTouch, { passive: false });
-
-    function preventTouch(event) {
-        event.preventDefault();
-    }
+    colorWheelCanvas.addEventListener('click', changeColor);
 }
 
 function toggleToolkit() {
@@ -225,12 +280,9 @@ function toggleToolkit() {
 
 function showToolkit() {
     const topRow = document.getElementById('canvas-button-row-top');
-    const canvasToolKit = document.getElementById('canvas-toolkit');
     const toggleToolkitImage = document.getElementById('toggle-toolkit-image');
     topRow.style.height = '170px';
-    // topRow.style.paddingTop = 0;
     canvasToolKit.style.display = 'flex';
-    // canvasToolKit.style.opacity = 1;
     toggleToolkitImage.src = 'images/minus_icon.png';
     setupColorWheel();
     isToolkitVisible = true;
@@ -238,30 +290,25 @@ function showToolkit() {
 
 function hideToolkit() {
     const topRow = document.getElementById('canvas-button-row-top');
-    const canvasToolKit = document.getElementById('canvas-toolkit');
     const toggleToolkitImage = document.getElementById('toggle-toolkit-image');
     topRow.style.height = '';
-    // topRow.style.paddingTop = '5px';
     toggleToolkitImage.src = 'images/plus_icon.png';
     setTimeout(() => {
         canvasToolKit.style.display = 'none';
     }, 300);
-    // canvasToolKit.style.opacity = 0;
     isToolkitVisible = false;
 }
 
 function undo() {
-    const canvas = document.getElementById('drawing-canvas');
     const ctx = canvas.getContext('2d');
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
     const currentStep = undoSteps.pop();
     const lastStep = undoSteps[undoSteps.length - 1];
-    if (currentStep) redoSteps.push(currentStep);
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
     if (lastStep) ctx.putImageData(lastStep, 0, 0);
+    if (currentStep) redoSteps.push(currentStep);
 }
 
 function redo() {
-    const canvas = document.getElementById('drawing-canvas');
     const ctx = canvas.getContext('2d');
     const nextStep = redoSteps.pop();
     if (nextStep) {
@@ -272,33 +319,81 @@ function redo() {
 }
 
 function changeSize(event) {
-    const selectedButton = event.target;
-    const dataSize = selectedButton.getAttribute('data-size');
-    const canvas = document.getElementById('drawing-canvas');
+    const dataSize = event.target.value;
     const ctx = canvas.getContext('2d');
     ctx.lineWidth = dataSize;
-
-    // Add the selected class to the correct button
-    const buttons = document.getElementsByClassName('size-button');
-    for (let button of buttons) {
-        button.classList.remove('selected');
-    }
-    selectedButton.classList.add('selected');
+    currentSize = dataSize;
 }
 
-function changeColor(event) {
-    const newColor = event.target.value;
-    currentColor = newColor;
+function finishDrawing() {
+    const drawingTitle = document.getElementById('drawing-title');
+    const canvasButtons = document.getElementById('drawing-canvas-buttons');
+    const drawingCanvasContainer = document.getElementById('drawing-canvas-container');
+    const drawingCanvas = document.getElementById('drawing-canvas');
+    const bigArrow = document.getElementById('big-arrow');
+    const shareToGallery = document.getElementById('share-to-gallery');
+    drawingTitle.style.opacity = 0;
+    canvasButtons.style.opacity = 0;
+    drawingCanvasContainer.style.transform = 'translate(0, 38%)';
+    drawingCanvasContainer.style.border = '1px solid #CCCCCC';
+    drawingCanvas.style.pointerEvents = 'none';
+    bigArrow.style.opacity = 1;
+    shareToGallery.style.opacity = 1;
+    shareToGallery.style.transform = 'translateY(0)';
+
+    // Add swipe up gesture recognizer for drawingCanvasContainer
+    let touchStartY = 0;
+    let touchEndY = 0;
+    drawingCanvasContainer.addEventListener('touchstart', function(event) {
+        touchStartY = event.changedTouches[0].screenY;
+    }, false);
+
+    drawingCanvasContainer.addEventListener('touchend', function(event) {
+        touchEndY = event.changedTouches[0].screenY;
+        handleSwipeGestureIfNeccesary();
+    }, false);
+
+    function handleSwipeGestureIfNeccesary() {
+        if (!(touchEndY < touchStartY - 100)) return;
+        drawingCanvasContainer.style.transform = 'translateY(-200%)';
+        setTimeout(() => {
+            bigArrow.style.opacity = 0;
+            shareToGallery.style.opacity = 0;
+            this.showEndState();
+        }, 750);
+        this.shareToGallery();
+    }
+}
+
+function shareToGallery() {
+    console.log("Sharing to gallery...");
 }
 
 function saveImage() {
-    const canvas = document.getElementById('drawing-canvas');
-    const link = document.createElement('a');
-    link.download = 'your_sun.png';
-    link.href = canvas.toDataURL();
-    link.click();
-    // const response = getSignedUrl();
-    // console.log(response);
+    // Set up the output image canvas
+    const canvasHeight = canvas.height;
+    const originalCanvasWidth = canvas.width;
+    outputImageCanvas.height = canvasHeight;
+    outputImageCanvas.width = originalCanvasWidth * 2;
+    const staticImage = new Image();
+    staticImage.src = 'images/halfsun_static.png';
+    staticImage.onload = function() {
+        outputImageCanvasCtx.drawImage(staticImage, 0, 0, originalCanvasWidth, canvasHeight);
+        outputImageCanvasCtx.drawImage(canvas, originalCanvasWidth, 0);
+
+        // Download the image
+        const link = document.createElement('a');
+        const timestamp = new Date().getTime();
+        link.download = `your_sun_${timestamp}.png`;
+        link.href = outputImageCanvas.toDataURL();
+        link.click();
+    };
+}
+
+function showEndState() {
+    const endContainer = document.getElementById('end-container');
+    endContainer.style.display = 'flex';
+    endContainer.style.opacity = 1;
 }
 
 async function getSignedUrl(folderPath) {

@@ -48,6 +48,62 @@ body, html {
     justify-content: space-between;
 }
 
+#welcome-text {
+    font-family: 'Review Thin';
+}
+
+#end-container {
+    display: none;
+    position: absolute;
+    align-items: center;
+    flex-direction: column;
+    opacity: 0;
+    top: 15%;
+    padding: 24px;
+    color: black;
+    justify-content: space-between;
+    transition: opacity 1000ms;
+}
+
+#end-container button {
+    background: #FF851A;
+    background-image: -webkit-linear-gradient(top, #FF851A, #c46c20);
+    background-image: -moz-linear-gradient(top, #FF851A, #c46c20);
+    background-image: -ms-linear-gradient(top, #FF851A, #c46c20);
+    background-image: -o-linear-gradient(top, #FF851A, #c46c20);
+    background-image: linear-gradient(to bottom, #FF851A, #c46c20);
+    border-radius: 8px;
+    -webkit-border-radius: 8px;
+    -moz-border-radius: 8px;
+    border: none;
+    color: #ffffff;
+    font-size: 14pt;
+    padding: 10px 20px 10px 20px;
+    font-family: 'Review Thin';
+    text-decoration: none;
+}
+
+#end-container button:active {
+    background: #FF851A;
+    background-image: linear-gradient(to bottom, #c46c20, #FF851A);
+    background-image: -webkit-linear-gradient(top, #c46c20, #FF851A);
+    background-image: -moz-linear-gradient(top, #c46c20, #FF851A);
+    background-image: -ms-linear-gradient(top, #c46c20, #FF851A);
+    background-image: -o-linear-gradient(top, #c46c20, #FF851A);
+}
+
+#end-title {
+    font-family: 'Review Bold';
+    font-size: 3.5em;
+}
+
+#share-buttons-container {
+    display: flex;
+    justify-content: space-evenly;
+    width: 100%;
+    margin-top: 20px;
+}
+
 h1 {
     font-size: 4em;
     margin: 0.67em 0;

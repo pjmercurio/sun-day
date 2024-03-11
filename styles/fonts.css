@@ -10,21 +10,20 @@
 }
 
 @font-face {
-    font-family: 'Review';
+    font-family: 'Review Thin';
     src: url('../fonts/Review-Thin.otf') format('opentype');
     font-weight: thin;
 }
 
 @font-face {
-    font-family: 'Review';
+    font-family: 'Review Light';
     src: url('../fonts/Review-Light.otf') format('opentype');
     font-weight: light;
 }
 
 @font-face {
-    font-family: 'Review';
+    font-family: 'Review Bold';
     src: url('../fonts/Review-Bold.otf') format('opentype');
-    font-weight: bold;
 }
 
 @font-face {
@@ -34,21 +33,18 @@
 }
 
 @font-face {
-    font-family: 'Review Condensed';
+    font-family: 'Review Condensed Thin';
     src: url('../fonts/ReviewCondensed-Thin.otf') format('opentype');
-    font-weight: thin;
 }
 
 @font-face {
-    font-family: 'Review Condensed';
+    font-family: 'Review Condensed Light';
     src: url('../fonts/ReviewCondensed-Light.otf') format('opentype');
-    font-weight: light;
 }
 
 @font-face {
-    font-family: 'Review Condensed';
+    font-family: 'Review Condensed Bold';
     src: url('../fonts/ReviewCondensed-Bold.otf') format('opentype');
-    font-weight: bold;
 }
 
 @font-face {
@@ -58,19 +54,17 @@
 }
 
 @font-face {
-    font-family: 'Review Poster';
+    font-family: 'Review Poster Thin';
     src: url('../fonts/ReviewPoster-Thin.otf') format('opentype');
-    font-weight: thin;
 }
 
 @font-face {
-    font-family: 'Review Poster';
+    font-family: 'Review Poster Light';
     src: url('../fonts/ReviewPoster-Light.otf') format('opentype');
-    font-weight: light;
 }
 
 @font-face {
-    font-family: 'Review Poster';
+    font-family: 'Review Poster Bold';
     src: url('../fonts/ReviewPoster-Bold.otf') format('opentype');
     font-weight: bold;
 }

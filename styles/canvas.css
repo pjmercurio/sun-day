@@ -41,7 +41,7 @@
 }
 
 #drawing-canvas-static {
-    background: url('../images/halfsun_static.png') no-repeat center / contain;
+    background: url('../images/halfsun_static.png') no-repeat right / contain;
 }
 
 #drawing-canvas-buttons {
@@ -74,17 +74,25 @@
     flex: 1;
 }
 
+#color-wheel-container {
+    position: relative;
+    display: flex;
+}
+
 #color-wheel-canvas {
     -webkit-tap-highlight-color: transparent;
+    cursor: pointer;
 }
 
 #color-indicator {
-    display: none;
     position: absolute;
+    left: 44px;
+    top: 44px;
     width: 10px;
     height: 10px;
     border-radius: 50%;
     border: 2px solid white;
+    pointer-events: none;
 }
 
 canvas {
@@ -149,6 +157,7 @@ canvas {
     justify-content: center;
     position: relative;
     border-right: 1px solid #000;
+    overflow: hidden;
 }
 
 .brush-button:not(:first-of-type) {

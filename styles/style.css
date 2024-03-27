@@ -14,6 +14,7 @@ body, html {
     transition: background-color 1000ms;
     overflow: hidden;
     touch-action: manipulation;
+    user-select: none;
 }
 
 .animatable-item {
@@ -79,6 +80,7 @@ body, html {
     color: #ffffff;
     font-size: 14pt;
     padding: 10px 20px 10px 20px;
+    cursor: pointer;
     font-family: 'Review Thin';
     text-decoration: none;
 }
@@ -102,6 +104,7 @@ body, html {
     justify-content: space-evenly;
     width: 100%;
     margin-top: 20px;
+    cursor: pointer;
 }
 
 h1 {
@@ -172,4 +175,5 @@ p {
     justify-content: space-between;
     align-content: center;
     align-items: center;
+    cursor: pointer;
 }

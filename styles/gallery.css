@@ -1,0 +1,77 @@
+body {
+  background-color: #EEEEEE;
+}
+
+.container {
+  display: flex;
+  flex-direction: column;
+}
+
+.photo-frame {
+  display: none;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  -webkit-backdrop-filter: blur(20px);
+  backdrop-filter: blur(20px);
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
+.photo {
+  max-width: 80%;
+  max-height: 80%;
+  box-shadow: 0 0 50px rgba(0, 0, 0, 0.3);
+  border-radius: 50px;
+  background-color: white;
+}
+
+.gallery-image {
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.gallery {
+    display: grid;
+    opacity: 0;
+    grid-template-columns: repeat(3, 1fr);
+    grid-gap: 40px;
+    padding: 40px;
+    transition: opacity 700ms ease-out;
+}
+
+@media (min-width: 900px) {
+  .gallery {
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+}
+
+.gallery img {
+  width: 100%;
+  height: auto;
+  border-radius: 30px;
+  background-color: white;
+  transition: transform 150ms ease-in-out, box-shadow 150ms ease-in-out;
+}
+
+.gallery img:hover {
+  transform: scale(1.05);
+  box-shadow: 0 0 30px rgba(0, 0, 0, 0.2);
+}
+
+h1 {
+  font-size: 7em;
+  margin: 0.67em 0.25em;
+  font-family: 'Review Bold';
+}
+
+h2 {
+  font-size: 2em;
+  font-family: 'Review Light';
+  text-align: center;
+}

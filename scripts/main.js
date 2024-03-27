@@ -3,6 +3,7 @@ let welcomeContainer;
 let drawingContainer;
 let canvas;
 let canvasToolKit;
+let link;
 const outputImageCanvas = document.createElement('canvas');
 const outputImageCanvasCtx = outputImageCanvas.getContext('2d');
 
@@ -20,6 +21,8 @@ document.addEventListener('DOMContentLoaded', function() {
     drawingContainer = document.getElementById('drawing-container');
     canvas = document.getElementById('drawing-canvas');
     canvasToolKit = document.getElementById('canvas-toolkit');
+    // Warm up the getSignedURL cloud function
+    getSignedUrl('uploads', 'test').then(() => console.log('Warm up complete'));
 });
 
 function startImageSlideshow() {
@@ -224,6 +227,7 @@ function setupColorWheel() {
     const colorWheelCanvas = document.getElementById('color-wheel-canvas');
     const ctx = colorWheelCanvas.getContext('2d');
     const dpr = window.devicePixelRatio || 1;
+    // let isDragging = false;
 
     // Set the desired size
     const desiredWidth = 100;
@@ -246,30 +250,44 @@ function setupColorWheel() {
     };
 
     function changeColor(event) {
-        // Get the bounding rectangle of the colorWheelCanvas
-        const rect = colorWheelCanvas.getBoundingClientRect();
-    
-        // Calculate the click position in the canvas's coordinate system
-        const x = (event.clientX - rect.left) * (colorWheelCanvas.width / rect.width);
-        const y = (event.clientY - rect.top) * (colorWheelCanvas.height / rect.height);
+        // if (event.type === 'mousedown' || event.type === 'touchstart') isDragging = true;
+        // if (!isDragging) return;
+
+        // Get the coordinates of the click relative to the color wheel
+        let x = event.offsetX;
+        let y = event.offsetY;
+        // If has a touch object, use relative touch coordinates
+        // if (event.touches?.length > 0) {
+        //     const touch = event.touches[0];
+        //     const clientX = touch.clientX;
+        //     const clientY = touch.clientY;
+        //     const rect = event.target.getBoundingClientRect();
+        //     x = clientX - rect.left;
+        //     y = clientY - rect.top;
+        // }
     
         // Get the color of the clicked pixel
-        const pixel = ctx.getImageData(x, y, 1, 1);
+        const pixel = ctx.getImageData(x * dpr, y * dpr, 1, 1);
         const data = pixel.data;
         const rgba = `rgba(${data[0]}, ${data[1]}, ${data[2]}, ${data[3] / 255})`;
         currentColor = rgba;
 
         // Convert colorWheelCanvas coordinates back to relative positioning within the container
-        const indicatorX = (event.clientX - rect.left) + 60;
-        const indicatorY = (event.clientY - rect.top) + 5;
+        const indicatorX = x;
+        const indicatorY = y;
 
-        // Update the indicator's position and make it visible
+        // Update the indicator's position and make it visible, subtracting half the width and height to center it
         const indicator = document.getElementById('color-indicator');
-        indicator.style.left = indicatorX + 'px';
-        indicator.style.top = indicatorY + 'px';
-        indicator.style.display = 'block';
+        indicator.style.left = indicatorX - 6 + 'px';
+        indicator.style.top = indicatorY - 6 + 'px';
     }
 
+    // colorWheelCanvas.addEventListener('mousedown', changeColor);
+    // colorWheelCanvas.addEventListener('mousemove', changeColor);
+    // colorWheelCanvas.addEventListener('mouseup', () => isDragging = false);
+    // colorWheelCanvas.addEventListener('touchstart', changeColor);
+    // colorWheelCanvas.addEventListener('touchmove', changeColor);
+    // colorWheelCanvas.addEventListener('touchend', () => isDragging = false);
     colorWheelCanvas.addEventListener('click', changeColor);
 }
 
@@ -360,34 +378,9 @@ function finishDrawing() {
             bigArrow.style.opacity = 0;
             shareToGallery.style.opacity = 0;
             this.showEndState();
+            this.askForName();
         }, 750);
-        this.shareToGallery();
     }
-}
-
-function shareToGallery() {
-    console.log("Sharing to gallery...");
-}
-
-function saveImage() {
-    // Set up the output image canvas
-    const canvasHeight = canvas.height;
-    const originalCanvasWidth = canvas.width;
-    outputImageCanvas.height = canvasHeight;
-    outputImageCanvas.width = originalCanvasWidth * 2;
-    const staticImage = new Image();
-    staticImage.src = 'images/halfsun_static.png';
-    staticImage.onload = function() {
-        outputImageCanvasCtx.drawImage(staticImage, 0, 0, originalCanvasWidth, canvasHeight);
-        outputImageCanvasCtx.drawImage(canvas, originalCanvasWidth, 0);
-
-        // Download the image
-        const link = document.createElement('a');
-        const timestamp = new Date().getTime();
-        link.download = `your_sun_${timestamp}.png`;
-        link.href = outputImageCanvas.toDataURL();
-        link.click();
-    };
 }
 
 function showEndState() {
@@ -396,8 +389,93 @@ function showEndState() {
     endContainer.style.opacity = 1;
 }
 
-async function getSignedUrl(folderPath) {
-    const response = await fetch(`https://us-central1-fresh-mason-364504.cloudfunctions.net/generateSignedUrl?folderPath=${encodeURIComponent(folderPath)}&mimeType=image/png`);
+function base64ToBlob(base64, contentType) {
+    const byteCharacters = atob(base64);
+    const byteArrays = [];
+
+    for (let offset = 0; offset < byteCharacters.length; offset += 512) {
+        const slice = byteCharacters.slice(offset, offset + 512);
+
+        const byteNumbers = new Array(slice.length);
+        for (let i = 0; i < slice.length; i++) {
+            byteNumbers[i] = slice.charCodeAt(i);
+        }
+
+        const byteArray = new Uint8Array(byteNumbers);
+        byteArrays.push(byteArray);
+    }
+
+    const blob = new Blob(byteArrays, {type: contentType});
+    return blob;
+}
+
+function askForName() {
+    const name = prompt("Optionally enter your name:", "");
+    shareToGallery(name || 'Anonymous');
+}
+
+async function shareToGallery(name) {
+    const canvasHeight = canvas.height;
+    const originalCanvasWidth = canvas.width;
+    outputImageCanvas.height = canvasHeight;
+    outputImageCanvas.width = originalCanvasWidth * 2;
+
+    // Load the static image and draw it on the canvas
+    await loadAndDrawImage('images/halfsun_static.png', originalCanvasWidth, canvasHeight);
+
+    // Prepare the image for download
+    const link = document.createElement('a');
+    const timestamp = new Date().getTime();
+    link.download = `your_sun_${timestamp}.png`;
+    link.href = outputImageCanvas.toDataURL();
+
+    try {
+        const data = await getSignedUrl('uploads', name);
+        const uploadUrl = data.url;
+        const file = outputImageCanvas.toDataURL('image/png').replace(/^data:image\/png;base64,/, '');
+        const blob = base64ToBlob(file, 'image/png');
+
+        const response = await fetch(uploadUrl, {
+            method: 'PUT',
+            body: blob
+        });
+
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        console.log('Image uploaded successfully');
+    } catch (error) {
+        console.error('There was a problem with the fetch operation:', error);
+    }
+}
+
+function loadAndDrawImage(src, width, height) {
+    return new Promise((resolve, reject) => {
+        const staticImage = new Image();
+        staticImage.src = src;
+        staticImage.onload = function() {
+            outputImageCanvasCtx.drawImage(staticImage, 0, 0, width, height);
+            outputImageCanvasCtx.drawImage(canvas, width, 0);
+            resolve();
+        };
+        staticImage.onerror = reject;
+    });
+}
+
+function saveImage() {
+    link.click();
+}
+
+async function getSignedUrl(folderPath, userName) {
+    const queryParams = new URLSearchParams({
+        folderPath,
+        userName,
+        mimeType: 'image/png'
+    }).toString();
+
+    const url = `https://us-central1-fresh-mason-364504.cloudfunctions.net/generateSignedUrl?${queryParams}`;
+    const response = await fetch(url);
+
     if (!response.ok) {
         throw new Error('Network response was not ok');
     }
